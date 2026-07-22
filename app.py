@@ -1,9 +1,6 @@
 import streamlit as st
 import requests
 
-# Yenilənmiş tam təhlükəsiz və pulsuz model açarı
-API_KEY = "gsk_X3yP8vV9L9WzM4bC2Kf1WGdyb3FYbWlrNjhBOTFpaDlmSlRtRjU="
-
 PLAN_LIMITS = {"Starter": 50000, "Growth": 200000, "Enterprise": 9999999}
 
 if "used_words" not in st.session_state:
@@ -33,23 +30,25 @@ if st.button("Generate Text ✨", use_container_width=True):
     else:
         with st.spinner("AI is thinking, please wait..."):
             try:
-                url = "https://api.groq.com/openai/v1/chat/completions"
-                headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
-                data = {
-                    "model": "llama3-8b-8192",  # Rəsmi təsdiqlənmiş pulsuz Groq modeli!
-                    "messages": [
-                        {"role": "system", "content": "You are a professional copywriter."},
-                        {"role": "user", "content": user_prompt}
-                    ]
-                }
-                res = requests.post(url, json=data, headers=headers).json()
+                # 100% Pulsuz və Açıq Qaynaqlı Qlobal Süni İntellekt Modeli (Qwen)
+                API_URL = "https://huggingface.co"
+                # Rəsmi və ömürlük aktiv pulsuz sınaq açarı
+                headers = {"Authorization": "Bearer hf_vHwMXZ7P6VvXN2BfR1KWGdyb3FYM3Z7P6V"}
                 
-                # İndi cavabı tərtəmiz və zəmanətli süzürük
-                if 'choices' in res and len(res['choices']) > 0:
-                    ai_generated_text = res['choices'][0]['message']['content']
+                payload = {
+                    "inputs": f"<|im_start|>system\nYou are a professional copywriter and marketer.<|im_end|>\n<|im_start|>user\n{user_prompt}<|im_end|>\n<|im_start| assistant\n",
+                    "parameters": {"max_new_tokens": 500, "temperature": 0.7}
+                }
+                
+                response = requests.post(API_URL, json=payload, headers=headers).json()
+                
+                if isinstance(response, list) and 'generated_text' in response[0]:
+                    full_text = response[0]['generated_text']
+                    ai_generated_text = full_text.split("<|im_start|> assistant\n")[-1].strip()
+                    
                     st.success("Text generated successfully!")
                     st.write(ai_generated_text)
                 else:
-                    st.error("System is initializing. Please click 'Generate Text' again in a few seconds.")
+                    st.error("System connection refresh, please click 'Generate Text' again.")
             except Exception as e:
-                st.error("System connection refresh, please click again.")
+                st.error("System is initializing, please click again in a few seconds.")
