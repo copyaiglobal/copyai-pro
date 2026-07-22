@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # Yenilənmiş tam təhlükəsiz və pulsuz model açarı
-API_KEY = "gsk_yV8jM3Z7P6VvXN2BfR1KWGdyb3FYM3Z7P6VvXN2BfR1K" 
+API_KEY = "gsk_X3yP8vV9L9WzM4bC2Kf1WGdyb3FYbWlrNjhBOTFpaDlmSlRtRjU="
 
 PLAN_LIMITS = {"Starter": 50000, "Growth": 200000, "Enterprise": 9999999}
 
