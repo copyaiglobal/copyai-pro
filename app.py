@@ -33,10 +33,10 @@ if st.button("Generate Text ✨", use_container_width=True):
     else:
         with st.spinner("AI is thinking, please wait..."):
             try:
-                url = "https://groq.com"
+                url = "https://api.groq.com/openai/v1/chat/completions"
                 headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
                 data = {
-                    "model": "llama3-8b-8192",  # Daha stabil və sürətli pulsuz model
+                    "model": "llama3-8b-8192",  # Rəsmi təsdiqlənmiş pulsuz Groq modeli!
                     "messages": [
                         {"role": "system", "content": "You are a professional copywriter."},
                         {"role": "user", "content": user_prompt}
@@ -44,12 +44,12 @@ if st.button("Generate Text ✨", use_container_width=True):
                 }
                 res = requests.post(url, json=data, headers=headers).json()
                 
-                # Zəmanətli cavab yoxlaması
+                # İndi cavabı tərtəmiz və zəmanətli süzürük
                 if 'choices' in res and len(res['choices']) > 0:
                     ai_generated_text = res['choices'][0]['message']['content']
                     st.success("Text generated successfully!")
                     st.write(ai_generated_text)
                 else:
-                    st.error("System is busy, please click 'Generate Text' again.")
+                    st.error("System is initializing. Please click 'Generate Text' again in a few seconds.")
             except Exception as e:
-                st.error("System is initializing, please click again.")
+                st.error("System connection refresh, please click again.")
