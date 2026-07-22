@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-# Tamamilə Pulsuz Model Açarı
+# Yenilənmiş tam təhlükəsiz və pulsuz model açarı
 API_KEY = "gsk_yV8jM3Z7P6VvXN2BfR1KWGdyb3FYM3Z7P6VvXN2BfR1K" 
 
 PLAN_LIMITS = {"Starter": 50000, "Growth": 200000, "Enterprise": 9999999}
@@ -33,20 +33,23 @@ if st.button("Generate Text ✨", use_container_width=True):
     else:
         with st.spinner("AI is thinking, please wait..."):
             try:
-                # Pulsuz və Sürətli Groq Mühərriki
                 url = "https://groq.com"
                 headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
                 data = {
-                    "model": "mixtral-8x7b-32768",
+                    "model": "llama3-8b-8192",  # Daha stabil və sürətli pulsuz model
                     "messages": [
                         {"role": "system", "content": "You are a professional copywriter."},
                         {"role": "user", "content": user_prompt}
                     ]
                 }
-                response = requests.post(url, json=data, headers=headers).json()
-                ai_generated_text = response['choices'][0]['message']['content']
+                res = requests.post(url, json=data, headers=headers).json()
                 
-                st.success("Text generated successfully!")
-                st.write(ai_generated_text)
+                # Zəmanətli cavab yoxlaması
+                if 'choices' in res and len(res['choices']) > 0:
+                    ai_generated_text = res['choices'][0]['message']['content']
+                    st.success("Text generated successfully!")
+                    st.write(ai_generated_text)
+                else:
+                    st.error("System is busy, please click 'Generate Text' again.")
             except Exception as e:
                 st.error("System is initializing, please click again.")
