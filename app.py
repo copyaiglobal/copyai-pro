@@ -42,9 +42,11 @@ if not st.session_state.is_logged_in:
             elif new_email in st.session_state.registered_users:
                 st.error("This email is already registered! Please log in.")
             else:
+                # Plan adını tərtəmiz təmizləyirik (Məsələn: "Starter")
+                selected_plan_name = plan_choice.split(" ")[0]
                 st.session_state.registered_users[new_email] = {
                     "password": new_password,
-                    "plan": plan_choice.split(" ")
+                    "plan": selected_plan_name
                 }
                 st.success("Account created successfully! Payment gateway ready.")
                 st.info("💡 Please switch to 'Log In' tab to access your secure dashboard.")
@@ -68,10 +70,15 @@ else:
     st.title("🚀 CopyAI Pro — AI Text Generator")
     st.subheader("Global SaaS Platform for Freelancers & Agencies")
 
+    # Əgər hər hansı bir səbəbdən plan adı səhv düşərsə, avtomatik "Starter" təyin edirik ki, xata verməsin
+    current_plan_name = st.session_state.get("current_plan", "Starter")
+    if current_plan_name not in PLAN_LIMITS:
+        current_plan_name = "Starter"
+
     st.sidebar.header("📊 User Dashboard")
-    st.sidebar.write(f"Current Plan: {st.session_state.current_plan} Plan")
-    st.sidebar.progress(min(st.session_state.used_words / PLAN_LIMITS[st.session_state.current_plan], 1.0))
-    st.sidebar.write(f"📝 Used Words: {st.session_state.used_words} / {PLAN_LIMITS[st.session_state.current_plan]}")
+    st.sidebar.write(f"Current Plan: {current_plan_name} Plan")
+    st.sidebar.progress(min(st.session_state.used_words / PLAN_LIMITS[current_plan_name], 1.0))
+    st.sidebar.write(f"📝 Used Words: {st.session_state.used_words} / {PLAN_LIMITS[current_plan_name]}")
     
     if st.sidebar.button("Log Out 🚪", use_container_width=True):
         st.session_state.is_logged_in = False
@@ -82,6 +89,5 @@ else:
         placeholder="Enter your topic here...",
         height=150
     )
-
-    if st.button("Generate Text ✨", use_container_width=True):
+if st.button("Generate Text ✨", use_container_width=True):
         st.info("🔒 This feature requires an active production API gateway. System is ready for launch!")
