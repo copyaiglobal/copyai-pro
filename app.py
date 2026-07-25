@@ -46,11 +46,10 @@ if not st.session_state.is_logged_in:
             elif new_email in st.session_state.registered_users:
                 st.error("This email is already registered! Please log in.")
             else:
-                # Plan adını tərtəmiz sadəcə bircə söz halına salırıq ("Starter")
-                selected_plan_word = plan_choice.split(" ")[0]
+                clean_plan_name = plan_choice.split(" ")
                 st.session_state.registered_users[new_email] = {
                     "password": new_password,
-                    "plan": selected_plan_word
+                    "plan": clean_plan_name
                 }
                 st.success("Account created successfully! Payment gateway ready.")
                 st.info("💡 Please switch to 'Log In' tab to access your secure dashboard.")
@@ -64,10 +63,9 @@ if not st.session_state.is_logged_in:
             if login_email in st.session_state.registered_users and st.session_state.registered_users[login_email]["password"] == login_password:
                 st.session_state.is_logged_in = True
                 
-                # Giriş zamanı datanı yoxlayırıq və bircə söz olduğuna əmin oluruq
                 user_raw_plan = st.session_state.registered_users[login_email]["plan"]
                 if isinstance(user_raw_plan, list):
-                    st.session_state.current_plan = str(user_raw_plan[0])
+                    st.session_state.current_plan = str(user_raw_plan)
                 else:
                     st.session_state.current_plan = str(user_raw_plan)
                 
@@ -76,31 +74,31 @@ if not st.session_state.is_logged_in:
             else:
                 st.error("Invalid email or password! Please check your credentials.")
 
-# --- 📊 REAL DASHBOARD & PREMIUM TEMPLATES (100% ENGLISH) ---
+# --- 📊 REAL DASHBOARD & PREMIUM TEMPLATES (YALNIZ GİRİŞ EDƏNDƏ GÖRÜNÜR) ---
 else:
     st.title("🚀 CopyAI Pro — AI Text Generator")
     st.subheader("Global SaaS Platform for Freelancers & Agencies")
 
-    # --- 🛡️ KÖHNƏ LİST DATALARINI TƏMİZLƏYƏN QƏTİ FİLTR ---
     raw_plan = st.session_state.get("current_plan", "Starter")
     if isinstance(raw_plan, list):
-        current_plan_name = str(raw_plan[0]) if raw_plan else "Starter"
+        current_plan_name = str(raw_plan) if raw_plan else "Starter"
     else:
         current_plan_name = str(raw_plan)
 
     if current_plan_name not in PLAN_LIMITS:
         current_plan_name = "Starter"
-# --- 📋 ENGLISH SIDEBAR TEMPLATES ---
-    st.sidebar.header("📊 User Dashboard")
-    st.sidebar.write(f"Current Plan: {current_plan_name} Plan")
-    st.sidebar.progress(min(st.session_state.used_words / PLAN_LIMITS[current_plan_name], 1.0))
-    st.sidebar.write(f"📝 Used Words: {st.session_state.used_words} / {PLAN_LIMITS[current_plan_name]}")
+
+    # --- 📋 ENGLISH SIDEBAR TEMPLATES ---
+st.sidebar.header("📊 User Dashboard")
+st.sidebar.write(f"Current Plan: {current_plan_name} Plan")
+st.sidebar.progress(min(st.session_state.used_words / PLAN_LIMITS[current_plan_name], 1.0))
+st.sidebar.write(f"📝 Used Words: {st.session_state.used_words} / {PLAN_LIMITS[current_plan_name]}")
     
-    st.sidebar.write("---")
-    st.sidebar.header("⚡ Premium Templates")
+st.sidebar.write("---")
+st.sidebar.header("⚡ Premium Templates")
     
     # 1. For Freelancers Section
-    with st.sidebar.expander("💼 For Freelancers"):
+with st.sidebar.expander("💼 For Freelancers"):
         if st.button("📝 Upwork Proposal Generator", use_container_width=True):
             st.session_state.template_text = "Write a high-converting, personalized Upwork proposal for a web design project. Focus on solving the client's problem."
         if st.button("🌟 Fiverr Gig Description", use_container_width=True):
@@ -113,7 +111,7 @@ else:
             st.session_state.template_text = "Write a professional, friendly invoice email requesting payment for the completed digital marketing project."
 
     # 2. For Agencies Section
-    with st.sidebar.expander("🏢 For Agencies"):
+with st.sidebar.expander("🏢 For Agencies"):
         if st.button("📣 Social Media Ad Copy", use_container_width=True):
             st.session_state.template_text = "Write 3 high-converting, emotional Facebook and Instagram ad copy variations for an eco-friendly water bottle brand."
         if st.button("🔍 SEO Blog Planner", use_container_width=True):
@@ -126,7 +124,7 @@ else:
             st.session_state.template_text = "Create a 7-day social media content calendar grid for an Instagram profile focused on personal finance education."
 
     # 3. For Companies Section
-    with st.sidebar.expander("🚀 For Companies"):
+with st.sidebar.expander("🚀 For Companies"):
         if st.button("💼 Job Descriptions", use_container_width=True):
             st.session_state.template_text = "Write an attractive, professional job description for a Remote Senior Python Developer position on LinkedIn."
         if st.button("📦 Product Descriptions", use_container_width=True):
@@ -135,22 +133,32 @@ else:
             st.session_state.template_text = "Draft a professional internal company email announcing the transition to a new project management platform next week."
         if st.button("🎯 Marketing Campaigns", use_container_width=True):
             st.session_state.template_text = "Generate a comprehensive 30-day product launch marketing campaign strategy and timeline for a new productivity SaaS tool."
-        if st.button("🗣️ Brand Voice Manager", use_container_width=True):
+if st.button("🗣️ Brand Voice Manager", use_container_width=True):
             st.session_state.template_text = "Analyze this text and generate a official brand voice and tone guidelines guide for copywriters: [Insert text here]"
 
-    st.sidebar.write("---")
-    if st.sidebar.button("Log Out 🚪", use_container_width=True):
+st.sidebar.write("---")
+if st.sidebar.button("Log Out 🚪", use_container_width=True):
         st.session_state.is_logged_in = False
         st.session_state.template_text = ""
         st.rerun()
 
-# --- 📝 MAIN TEXT AREA ---
-    user_prompt = st.text_area(
-    "What do you want the AI to write? (e.g., 'Social media post', 'Blog article')",
-    value=st.session_state.template_text,
-    placeholder="Select a template from the sidebar or enter your topic here...",
-    height=150
-)
+    # --- 🎭 100% ENGLISH TONE OF VOICE SELECTOR ---
+st.write("### 🗣️ Select Tone of Voice")
+selected_tone = st.selectbox(
+        "Choose the style and emotion for the AI generation:",
+        ["Professional 💼", "Casual ☕", "Witty & Funny ✨", "Persuasive & Sales 📈", "Bold & Confident 🔥", "Empathetic & Friendly ❤️"]
+    )
+
+st.write("---")
+
+    # --- 📝 MAIN TEXT AREA ---
+user_prompt = st.text_area(
+        "What do you want the AI to write? (e.g., 'Social media post', 'Blog article')",
+        value=st.session_state.template_text,
+        placeholder="Select a template from the sidebar or enter your topic here...",
+        height=150
+    )
 
 if st.button("Generate Text ✨", use_container_width=True):
-    st.info("🔒 This feature requires an active production API gateway. System is ready for launch!")
+        # Arxa fonda seçilən tonallığı da qeyd edən vizual bildiriş
+        st.info(f"🔒 Active Tone: {selected_tone}. This feature requires an active production API gateway. System is ready for launch!")
