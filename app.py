@@ -46,10 +46,11 @@ if not st.session_state.is_logged_in:
             elif new_email in st.session_state.registered_users:
                 st.error("This email is already registered! Please log in.")
             else:
-                selected_plan_name = plan_choice.split(" ")
+                # Plan adını tərtəmiz sadəcə bircə söz halına salırıq ("Starter")
+                selected_plan_word = plan_choice.split(" ")[0]
                 st.session_state.registered_users[new_email] = {
                     "password": new_password,
-                    "plan": selected_plan_name
+                    "plan": selected_plan_word
                 }
                 st.success("Account created successfully! Payment gateway ready.")
                 st.info("💡 Please switch to 'Log In' tab to access your secure dashboard.")
@@ -62,7 +63,14 @@ if not st.session_state.is_logged_in:
         if st.button("Verify & Log In 🚀", use_container_width=True):
             if login_email in st.session_state.registered_users and st.session_state.registered_users[login_email]["password"] == login_password:
                 st.session_state.is_logged_in = True
-                st.session_state.current_plan = st.session_state.registered_users[login_email]["plan"]
+                
+                # Giriş zamanı datanı yoxlayırıq və bircə söz olduğuna əmin oluruq
+                user_raw_plan = st.session_state.registered_users[login_email]["plan"]
+                if isinstance(user_raw_plan, list):
+                    st.session_state.current_plan = str(user_raw_plan[0])
+                else:
+                    st.session_state.current_plan = str(user_raw_plan)
+                
                 st.success("Access Granted! Welcome back.")
                 st.rerun()
             else:
@@ -73,25 +81,26 @@ else:
     st.title("🚀 CopyAI Pro — AI Text Generator")
     st.subheader("Global SaaS Platform for Freelancers & Agencies")
 
+    # --- 🛡️ KÖHNƏ LİST DATALARINI TƏMİZLƏYƏN QƏTİ FİLTR ---
     raw_plan = st.session_state.get("current_plan", "Starter")
     if isinstance(raw_plan, list):
-        current_plan_name = raw_plan if raw_plan else "Starter"
+        current_plan_name = str(raw_plan[0]) if raw_plan else "Starter"
     else:
         current_plan_name = str(raw_plan)
 
     if current_plan_name not in PLAN_LIMITS:
         current_plan_name = "Starter"
-
-    # --- 📋 ENGLISH SIDEBAR TEMPLATES ---
+# --- 📋 ENGLISH SIDEBAR TEMPLATES ---
     st.sidebar.header("📊 User Dashboard")
     st.sidebar.write(f"Current Plan: {current_plan_name} Plan")
     st.sidebar.progress(min(st.session_state.used_words / PLAN_LIMITS[current_plan_name], 1.0))
     st.sidebar.write(f"📝 Used Words: {st.session_state.used_words} / {PLAN_LIMITS[current_plan_name]}")
-st.sidebar.write("---")
-st.sidebar.header("⚡ Premium Templates")
+    
+    st.sidebar.write("---")
+    st.sidebar.header("⚡ Premium Templates")
     
     # 1. For Freelancers Section
-with st.sidebar.expander("💼 For Freelancers"):
+    with st.sidebar.expander("💼 For Freelancers"):
         if st.button("📝 Upwork Proposal Generator", use_container_width=True):
             st.session_state.template_text = "Write a high-converting, personalized Upwork proposal for a web design project. Focus on solving the client's problem."
         if st.button("🌟 Fiverr Gig Description", use_container_width=True):
@@ -104,7 +113,7 @@ with st.sidebar.expander("💼 For Freelancers"):
             st.session_state.template_text = "Write a professional, friendly invoice email requesting payment for the completed digital marketing project."
 
     # 2. For Agencies Section
-with st.sidebar.expander("🏢 For Agencies"):
+    with st.sidebar.expander("🏢 For Agencies"):
         if st.button("📣 Social Media Ad Copy", use_container_width=True):
             st.session_state.template_text = "Write 3 high-converting, emotional Facebook and Instagram ad copy variations for an eco-friendly water bottle brand."
         if st.button("🔍 SEO Blog Planner", use_container_width=True):
@@ -117,7 +126,7 @@ with st.sidebar.expander("🏢 For Agencies"):
             st.session_state.template_text = "Create a 7-day social media content calendar grid for an Instagram profile focused on personal finance education."
 
     # 3. For Companies Section
-with st.sidebar.expander("🚀 For Companies"):
+    with st.sidebar.expander("🚀 For Companies"):
         if st.button("💼 Job Descriptions", use_container_width=True):
             st.session_state.template_text = "Write an attractive, professional job description for a Remote Senior Python Developer position on LinkedIn."
         if st.button("📦 Product Descriptions", use_container_width=True):
@@ -129,14 +138,14 @@ with st.sidebar.expander("🚀 For Companies"):
         if st.button("🗣️ Brand Voice Manager", use_container_width=True):
             st.session_state.template_text = "Analyze this text and generate a official brand voice and tone guidelines guide for copywriters: [Insert text here]"
 
-st.sidebar.write("---")
-if st.sidebar.button("Log Out 🚪", use_container_width=True):
+    st.sidebar.write("---")
+    if st.sidebar.button("Log Out 🚪", use_container_width=True):
         st.session_state.is_logged_in = False
         st.session_state.template_text = ""
         st.rerun()
+
 # --- 📝 MAIN TEXT AREA ---
-# Bu hissə artıq qeydiyyatdan əvvəl də, sonra də tam təhlükəsiz işləyir!
-user_prompt = st.text_area(
+    user_prompt = st.text_area(
     "What do you want the AI to write? (e.g., 'Social media post', 'Blog article')",
     value=st.session_state.template_text,
     placeholder="Select a template from the sidebar or enter your topic here...",
