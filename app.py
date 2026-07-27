@@ -86,7 +86,8 @@ else:
     elif "Enterprise" in str(raw_plan): current_plan_name = "Enterprise"
     
     max_limit = PLAN_LIMITS.get(current_plan_name, 50000)
-
+    current_plan_name = st.session_state.get("current_plan", "Starter")
+    max_limit = PLAN_LIMITS.get(current_plan_name, 50000)
     st.sidebar.header("📊 User Dashboard")
     st.sidebar.write(f"Current Plan: {current_plan_name} Plan")
     st.sidebar.progress(min(st.session_state.used_words / max_limit, 1.0))
