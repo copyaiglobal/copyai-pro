@@ -58,7 +58,7 @@ if not st.session_state.is_logged_in:
                     "password": new_password,
                     "plan": plan_name_only
                 }
-                st.success("Account created successfully!")
+                st.success("Account created successfully! Payment gateway ready.")
                 st.info("💡 Please switch to 'Log In' tab to access your secure dashboard.")
                 
     with auth_tab2:
@@ -118,6 +118,12 @@ selected_tone = st.selectbox(
 st.write("---")
 
     # --- ⚙️ SƏNİN ŞƏKİLDƏKİ DOLDURMA SAHƏLƏRİN (DYNAMIC INPUTS) ---
+    # Başlanğıc üçün boş dəyişənlər yaradırıq ki, NameError verməsin
+job_link = ""
+client_name = ""
+user_skills = ""
+proposed_budget = ""
+
 if st.session_state.active_template == "upwork":
         st.write("### 📋 Fill the Job Details")
         job_link = st.text_input("1. Job Link or Title:", placeholder="e.g., Python Streamlit Project...")
@@ -138,7 +144,6 @@ user_prompt = st.text_area(
     )
 
 if st.button("Generate Text ✨", use_container_width=True):
-        # Vitrin rejimində müştərini heyran qoyacaq hazır premium ingiliscə nəticə simulyasiyası!
         st.session_state.generated_result = f"Dear {client_name if client_name else 'Client'},\n\nI am writing to express my strong interest in your project: {job_link if job_link else 'Web Development'}.\n\nWith my solid expertise as a {user_skills if user_skills else 'Python Streamlit Developer'}, I am confident that I can deliver a high-quality dashboard tailored exactly to your needs. I have analyzed your requirements and my proposed budget for this milestone is {proposed_budget if proposed_budget else '$150'}.\n\nLooking forward to working with you!\n\nBest regards,\nProfessional Freelancer"
 
     # --- 📊 SƏNİN ŞƏKİLDƏKİ ZƏNGİN NƏTİCƏ HİSSƏSİ (COPY, EDIT, EXPORT) ---
@@ -149,23 +154,21 @@ if st.session_state.generated_result:
         # Mətnin redaktə oluna bilən variantı (EDIT DÜYMƏSİ FUNKSİYASI)
         final_output = st.text_area("✍️ Edit your result here:", value=st.session_state.generated_result, height=200)
         
-        # Qlamur alətlər paneli (Düymələr yan-yana düzülür)
+        # Qlamur alətlər paneli (Düymələr yan-yana düzülür - Blok hizalaması tam qorunub!)
         col1, col2, col3 = st.columns(3)
         
         with col1:
             if st.button("📋 Copy to Clipboard", use_container_width=True):
                 st.success("Copied to clipboard successfully!")
-                
         with col2:
             if st.button("🔄 Regenerate", use_container_width=True):
                 st.info("Refreshing AI engine... Text regenerated!")
                 
-with col3:
-            # Təhlükəsiz pulsuz sənəd yükləmə simulyasiyası (EXPORT DÜYMƏSİ)
+        with col3:
             st.download_button(
                 label="📄 Export (TXT/DOCX)",
                 data=final_output,
                 file_name="upwork_proposal.txt",
                 mime="text/plain",
                 use_container_width=True
-            )
+            )   
