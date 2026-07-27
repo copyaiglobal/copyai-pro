@@ -91,6 +91,15 @@ else:
 
     if current_plan_name not in PLAN_LIMITS:
         current_plan_name = "Starter"
+raw_plan = st.session_state.get("current_plan", "Starter")
+
+if isinstance(raw_plan, list):
+    current_plan_name = str(raw_plan[0]) if raw_plan else "Starter"
+else:
+    current_plan_name = str(raw_plan)
+
+if current_plan_name not in PLAN_LIMITS:
+    current_plan_name = "Starter"       
 # --- 📋 ENGLISH SIDEBAR TEMPLATES ---
 st.sidebar.header("📊 User Dashboard")
 st.sidebar.write(f"Current Plan: {current_plan_name} Plan")
