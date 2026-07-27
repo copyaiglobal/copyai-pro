@@ -53,7 +53,7 @@ if not st.session_state.is_logged_in:
                 st.error("This email is already registered! Please log in.")
             else:
                 selected_plan_parts = plan_choice.split(" ")
-                plan_name_only = selected_plan_parts if selected_plan_parts else "Starter"
+                plan_name_only = selected_plan_parts[0] if selected_plan_parts else "Starter"
                 st.session_state.registered_users[new_email] = {
                     "password": new_password,
                     "plan": plan_name_only
@@ -69,8 +69,13 @@ if not st.session_state.is_logged_in:
         if st.button("Verify & Log In 🚀", use_container_width=True):
             if login_email in st.session_state.registered_users and st.session_state.registered_users[login_email]["password"] == login_password:
                 st.session_state.is_logged_in = True
+                
                 user_raw_plan = st.session_state.registered_users[login_email]["plan"]
-                st.session_state.current_plan = str(user_raw_plan)
+                if isinstance(user_raw_plan, list):
+                    st.session_state.current_plan = str(user_raw_plan[0]) if user_raw_plan else "Starter"
+                else:
+                    st.session_state.current_plan = str(user_raw_plan)
+                
                 st.success("Access Granted! Welcome back.")
                 st.rerun()
             else:
@@ -81,27 +86,33 @@ else:
     st.title("🚀 CopyAI Pro — AI Text Generator")
     st.subheader("Global SaaS Platform for Freelancers & Agencies")
 
-    current_plan_name = st.session_state.get("current_plan", "Starter")
+    # --- 🛡️ PLANI MƏTNƏ ÇEVİRƏN VƏ XƏTANI ÖLDÜRƏN QƏTİ SƏDD ---
+    raw_plan = st.session_state.get("current_plan", "Starter")
+    if isinstance(raw_plan, list):
+        current_plan_name = str(raw_plan[0]) if raw_plan else "Starter"
+    else:
+        current_plan_name = str(raw_plan)
+# Əgər hər hansı səbəbdən plan adı lüğətdə yoxdursa, məcburi Starter edirik
     if current_plan_name not in PLAN_LIMITS:
         current_plan_name = "Starter"
 
     # --- 📋 ENGLISH SIDEBAR TEMPLATES ---
     st.sidebar.header("📊 User Dashboard")
     st.sidebar.write(f"Current Plan: {current_plan_name} Plan")
-st.sidebar.progress(min(st.session_state.used_words / PLAN_LIMITS[current_plan_name], 1.0))
-st.sidebar.write(f"📝 Used Words: {st.session_state.used_words} / {PLAN_LIMITS[current_plan_name]}")
+    st.sidebar.progress(min(st.session_state.used_words / PLAN_LIMITS[current_plan_name], 1.0))
+    st.sidebar.write(f"📝 Used Words: {st.session_state.used_words} / {PLAN_LIMITS[current_plan_name]}")
     
-st.sidebar.write("---")
-st.sidebar.header("⚡ Premium Templates")
+    st.sidebar.write("---")
+    st.sidebar.header("⚡ Premium Templates")
     
-with st.sidebar.expander("💼 For Freelancers"):
+    with st.sidebar.expander("💼 For Freelancers"):
         if st.button("📝 Upwork Proposal Generator", use_container_width=True):
             st.session_state.active_template = "upwork"
             st.session_state.template_text = ""
             st.session_state.generated_result = ""
 
-st.sidebar.write("---")
-if st.sidebar.button("Log Out 🚪", use_container_width=True):
+    st.sidebar.write("---")
+    if st.sidebar.button("Log Out 🚪", use_container_width=True):
         st.session_state.is_logged_in = False
         st.session_state.template_text = ""
         st.session_state.active_template = ""
@@ -109,22 +120,21 @@ if st.sidebar.button("Log Out 🚪", use_container_width=True):
         st.rerun()
 
     # --- 🎭 TONE OF VOICE SELECTOR ---
-st.write("### 🗣️ Select Tone of Voice")
-selected_tone = st.selectbox(
+    st.write("### 🗣️ Select Tone of Voice")
+    selected_tone = st.selectbox(
         "Choose the style and emotion for the AI generation:",
         ["Professional 💼", "Casual ☕", "Witty & Funny ✨", "Persuasive 📈"]
     )
 
-st.write("---")
+    st.write("---")
 
     # --- ⚙️ SƏNİN ŞƏKİLDƏKİ DOLDURMA SAHƏLƏRİN (DYNAMIC INPUTS) ---
-    # Başlanğıc üçün boş dəyişənlər yaradırıq ki, NameError verməsin
-job_link = ""
-client_name = ""
-user_skills = ""
-proposed_budget = ""
+    job_link = ""
+    client_name = ""
+    user_skills = ""
+    proposed_budget = ""
 
-if st.session_state.active_template == "upwork":
+    if st.session_state.active_template == "upwork":
         st.write("### 📋 Fill the Job Details")
         job_link = st.text_input("1. Job Link or Title:", placeholder="e.g., Python Streamlit Project...")
         client_name = st.text_input("2. Client's Name (If known):", placeholder="e.g., John Doe...")
@@ -136,39 +146,38 @@ if st.session_state.active_template == "upwork":
         st.write("---")
 
     # --- 📝 MAIN TEXT AREA ---
-user_prompt = st.text_area(
+    user_prompt = st.text_area(
         "Final Prompt Dashboard",
         value=st.session_state.template_text,
         placeholder="Select a template from the sidebar or fill the inputs...",
         height=100
     )
 
-if st.button("Generate Text ✨", use_container_width=True):
+    if st.button("Generate Text ✨", use_container_width=True):
         st.session_state.generated_result = f"Dear {client_name if client_name else 'Client'},\n\nI am writing to express my strong interest in your project: {job_link if job_link else 'Web Development'}.\n\nWith my solid expertise as a {user_skills if user_skills else 'Python Streamlit Developer'}, I am confident that I can deliver a high-quality dashboard tailored exactly to your needs. I have analyzed your requirements and my proposed budget for this milestone is {proposed_budget if proposed_budget else '$150'}.\n\nLooking forward to working with you!\n\nBest regards,\nProfessional Freelancer"
 
     # --- 📊 SƏNİN ŞƏKİLDƏKİ ZƏNGİN NƏTİCƏ HİSSƏSİ (COPY, EDIT, EXPORT) ---
-if st.session_state.generated_result:
+    if st.session_state.generated_result:
         st.write("---")
         st.write("### ✨ AI Generated Result")
         
-        # Mətnin redaktə oluna bilən variantı (EDIT DÜYMƏSİ FUNKSİYASI)
         final_output = st.text_area("✍️ Edit your result here:", value=st.session_state.generated_result, height=200)
         
-        # Qlamur alətlər paneli (Düymələr yan-yana düzülür - Blok hizalaması tam qorunub!)
         col1, col2, col3 = st.columns(3)
         
         with col1:
             if st.button("📋 Copy to Clipboard", use_container_width=True):
                 st.success("Copied to clipboard successfully!")
-        with col2:
+                
+with col2:
             if st.button("🔄 Regenerate", use_container_width=True):
                 st.info("Refreshing AI engine... Text regenerated!")
                 
-        with col3:
+with col3:
             st.download_button(
                 label="📄 Export (TXT/DOCX)",
                 data=final_output,
                 file_name="upwork_proposal.txt",
                 mime="text/plain",
                 use_container_width=True
-            )   
+            )
