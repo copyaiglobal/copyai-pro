@@ -63,7 +63,7 @@ if not st.session_state.is_logged_in:
                 st.error("This email is already registered! Please log in.")
             else:
                 selected_plan_parts = plan_choice.split(" ")
-                plan_name_only = selected_plan_parts[0] if selected_plan_parts else "Starter"
+                plan_name_only = selected_plan_parts if selected_plan_parts else "Starter"
                 st.session_state.registered_users[new_email] = {
                     "password": new_password,
                     "plan": plan_name_only
@@ -82,7 +82,7 @@ if not st.session_state.is_logged_in:
                 
                 user_raw_plan = st.session_state.registered_users[login_email]["plan"]
                 if isinstance(user_raw_plan, list):
-                    st.session_state.current_plan = str(user_raw_plan[0]) if user_raw_plan else "Starter"
+                    st.session_state.current_plan = str(user_raw_plan) if user_raw_plan else "Starter"
                 else:
                     st.session_state.current_plan = str(user_raw_plan)
                 
@@ -97,7 +97,7 @@ else:
 
     raw_plan = st.session_state.get("current_plan", "Starter")
     if isinstance(raw_plan, list):
-        current_plan_name = str(raw_plan[0]) if raw_plan else "Starter"
+        current_plan_name = str(raw_plan) if raw_plan else "Starter"
     else:
         current_plan_name = str(raw_plan)
 
@@ -162,11 +162,19 @@ else:
         u_skills = st.session_state.user_skills_val if st.session_state.user_skills_val else 'Python Streamlit Developer'
         p_budget = st.session_state.proposed_budget_val if st.session_state.proposed_budget_val else '$150'
         
-        st.session_state.generated_result = f"Dear {c_name},\n\nI am writing to express my strong interest in your project: {j_link}.\n\nWith my solid expertise as a {u_skills}, I am confident that I can deliver a high-quality dashboard tailored exactly to your needs.
-        "I have analyzed your requirements and my proposed budget for this milestone is {p_budget}.\n\nLooking forward to working with you!\n\nBest regards,\nProfessional Freelancer"
+        # ÜÇLÜ DIRNAQ BLOKU - BÜTÜN SYNTAX ERROR-LARI AVTOMATİK ÖLDÜRÜR
+        st.session_state.generated_result = f"""Dear {c_name},
+
+I am writing to express my strong interest in your project: {j_link}.
+With my solid expertise as a {u_skills}, I am confident that I can deliver a high-quality dashboard tailored exactly to your needs. I have analyzed your requirements and my proposed budget for this milestone is {p_budget}.
+
+Looking forward to working with you!
+
+Best regards,
+Professional Freelancer"""
 
     # --- 📊 SƏNİN ŞƏKİLDƏKİ ZƏNGİN NƏTİCƏ HİSSƏSİ (COPY, EDIT, EXPORT) ---
-if st.session_state.generated_result:
+    if st.session_state.generated_result:
         st.write("---")
         st.write("### ✨ AI Generated Result")
         
