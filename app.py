@@ -91,6 +91,7 @@ else:
     st.sidebar.header("📊 User Dashboard")
     st.sidebar.write(f"Current Plan: {current_plan_name} Plan")
     st.sidebar.progress(min(st.session_state.used_words / max_limit, 1.0))
+max_limit = 50000
 st.sidebar.write(f"📝 Used Words: {st.session_state.used_words} / {max_limit}")
     
 st.sidebar.write("---")
