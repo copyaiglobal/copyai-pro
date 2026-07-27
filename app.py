@@ -28,15 +28,15 @@ if "used_words" not in st.session_state:
 if "current_plan" not in st.session_state:
     st.session_state.current_plan = "Starter"
 
-# Doldurma xanalarının datalarını yaddaşda saxlayırıq
-if "input_val_1" not in st.session_state:
-    st.session_state.input_val_1 = ""
-if "input_val_2" not in st.session_state:
-    st.session_state.input_val_2 = ""
-if "input_val_3" not in st.session_state:
-    st.session_state.input_val_3 = ""
-if "input_val_4" not in st.session_state:
-    st.session_state.input_val_4 = ""
+# Upwork xanalarının datalarını yaddaşda ayrıca kilidləyirik
+if "upwork_link" not in st.session_state:
+    st.session_state.upwork_link = ""
+if "upwork_client" not in st.session_state:
+    st.session_state.upwork_client = ""
+if "upwork_skills" not in st.session_state:
+    st.session_state.upwork_skills = ""
+if "upwork_budget" not in st.session_state:
+    st.session_state.upwork_budget = ""
 
 st.set_page_config(page_title="CopyAI Pro - SaaS", page_icon="🚀", layout="centered")
 
@@ -84,18 +84,13 @@ else:
     st.title("🚀 CopyAI Pro — AI Text Generator")
     st.subheader("Global SaaS Platform for Freelancers & Agencies")
 
-    # --- 🛡️ PLANI MƏTNƏ ÇEVİRƏN FILTR ---
     current_plan_name = "Starter"
     raw_plan = st.session_state.get("current_plan", "Starter")
-    if "Growth" in str(raw_plan):
-        current_plan_name = "Growth"
-    elif "Enterprise" in str(raw_plan):
-        current_plan_name = "Enterprise"
-    else:
-        current_plan_name = "Starter"
-
+    if "Growth" in str(raw_plan): current_plan_name = "Growth"
+    elif "Enterprise" in str(raw_plan): current_plan_name = "Enterprise"
+    
     max_limit = PLAN_LIMITS.get(current_plan_name, 50000)
-# --- 📋 ENGLISH SIDEBAR BÜTÜN ŞABLONLAR BURADADIR ---
+# --- 📋 SIDEBAR BÜTÜN 15 ŞABLON GERİ GƏLDİ ---
     st.sidebar.header("📊 User Dashboard")
     st.sidebar.write(f"Current Plan: {current_plan_name} Plan")
     st.sidebar.progress(min(st.session_state.used_words / max_limit, 1.0))
@@ -107,50 +102,69 @@ else:
     # 1. For Freelancers
     with st.sidebar.expander("💼 For Freelancers"):
         if st.button("📝 Upwork Proposal Generator", use_container_width=True):
-            st.session_state.active_template = "Upwork Proposal"
+            st.session_state.active_template = "upwork"
             st.session_state.template_text = ""
             st.session_state.generated_result = ""
         if st.button("🌟 Fiverr Gig Description", use_container_width=True):
-            st.session_state.active_template = "Fiverr Gig Description"
-            st.session_state.template_text = ""
+            st.session_state.active_template = "fiverr"
+            st.session_state.template_text = "Create an optimized, catchy Fiverr gig description for a professional translation service with SEO keywords."
             st.session_state.generated_result = ""
         if st.button("✉️ Client Follow-up Email", use_container_width=True):
-            st.session_state.active_template = "Client Follow-up Email"
-            st.session_state.template_text = ""
+            st.session_state.active_template = "followup"
+            st.session_state.template_text = "Draft a polite and professional follow-up email to a client who hasn't responded to the latest design submission."
             st.session_state.generated_result = ""
         if st.button("📊 Project Estimate", use_container_width=True):
-            st.session_state.active_template = "Project Estimate"
-            st.session_state.template_text = ""
+            st.session_state.active_template = "estimate"
+            st.session_state.template_text = "Generate a formal project estimate and cost breakdown for building a custom mobile app for a small local business."
             st.session_state.generated_result = ""
         if st.button("🧾 Invoice Email", use_container_width=True):
-            st.session_state.active_template = "Invoice Email"
-            st.session_state.template_text = ""
+            st.session_state.active_template = "invoice"
+            st.session_state.template_text = "Write a professional, friendly invoice email requesting payment for the completed digital marketing project."
             st.session_state.generated_result = ""
 
     # 2. For Agencies
     with st.sidebar.expander("🏢 For Agencies"):
         if st.button("📣 Social Media Ad Copy", use_container_width=True):
-            st.session_state.active_template = "Social Media Ad Copy"
-            st.session_state.template_text = ""
+            st.session_state.active_template = "agency_ad"
+            st.session_state.template_text = "Write 3 high-converting, emotional Facebook and Instagram ad copy variations for an eco-friendly water bottle brand."
             st.session_state.generated_result = ""
         if st.button("🔍 SEO Blog Planner", use_container_width=True):
-            st.session_state.active_template = "SEO Blog Planner"
-            st.session_state.template_text = ""
+            st.session_state.active_template = "agency_blog"
+            st.session_state.template_text = "Create a complete SEO-optimized blog outline and content plan for the topic 'How to start affiliate marketing in 2026'."
             st.session_state.generated_result = ""
         if st.button("📈 Client Report Summary", use_container_width=True):
-            st.session_state.active_template = "Client Report Summary"
-            st.session_state.template_text = ""
+            st.session_state.active_template = "agency_report"
+            st.session_state.template_text = "Generate a weekly marketing performance report summary for a retail client, highlight 15% increase in conversion rates."
             st.session_state.generated_result = ""
-
-    # 3. For Companies
+        if st.button("❄️ Cold Email Campaign", use_container_width=True):
+            st.session_state.active_template = "agency_cold"
+            st.session_state.template_text = "Draft a compelling cold email outreach template targeting e-commerce store owners to sell web development services."
+            st.session_state.generated_result = ""
+        if st.button("📅 Content Calendar Creator", use_container_width=True):
+            st.session_state.active_template = "agency_calendar"
+            st.session_state.template_text = "Create a 7-day social media content calendar grid for an Instagram profile focused on personal finance education."
+            st.session_state.generated_result = ""
+# 3. For Companies
     with st.sidebar.expander("🚀 For Companies"):
         if st.button("💼 Job Descriptions", use_container_width=True):
-            st.session_state.active_template = "Job Description"
-            st.session_state.template_text = ""
+            st.session_state.active_template = "company_job"
+            st.session_state.template_text = "Write an attractive, professional job description for a Remote Senior Python Developer position on LinkedIn."
             st.session_state.generated_result = ""
         if st.button("📦 Product Descriptions", use_container_width=True):
-            st.session_state.active_template = "Product Description"
-            st.session_state.template_text = ""
+            st.session_state.active_template = "company_prod"
+            st.session_state.template_text = "Create a compelling, benefits-focused e-commerce product description for an ergonomic leather office chair."
+            st.session_state.generated_result = ""
+        if st.button("📁 Internal Communications", use_container_width=True):
+            st.session_state.active_template = "company_internal"
+            st.session_state.template_text = "Draft a professional internal company email announcing the transition to a new project management platform next week."
+            st.session_state.generated_result = ""
+        if st.button("🎯 Marketing Campaigns", use_container_width=True):
+            st.session_state.active_template = "company_market"
+            st.session_state.template_text = "Generate a comprehensive 30-day product launch marketing campaign strategy and timeline for a new productivity SaaS tool."
+            st.session_state.generated_result = ""
+        if st.button("🗣️ Brand Voice Manager", use_container_width=True):
+            st.session_state.active_template = "company_voice"
+            st.session_state.template_text = "Analyze this text and generate a official brand voice and tone guidelines guide for copywriters: [Insert text here]"
             st.session_state.generated_result = ""
 
     st.sidebar.write("---")
@@ -161,43 +175,23 @@ else:
         st.session_state.generated_result = ""
         st.rerun()
 
-    # --- 🎭 TONE OF VOICE SELECTOR ---
-    st.write("### 🗣️ Select Tone of Voice")
-    selected_tone = st.selectbox(
-        "Choose the style and emotion for the AI generation:",
-        ["Professional 💼", "Casual ☕", "Witty & Funny ✨", "Persuasive 📈"]
-    )
-
-    st.write("---")
-
-    # --- ⚙️ SƏNİN İSTƏDİYİN DOLDURMA SAHƏLƏRİN (DYNAMIC INPUTS) ---
-    # Əgər hər hansı bir şablon seçilibsə, xanalar dinamik adlarla avtomatik açılır!
-    if st.session_state.active_template:
-        st.write(f"### 📋 Fill the {st.session_state.active_template} Details")
-        st.session_state.input_val_1 = st.text_input("1. Project Title or Link:", value=st.session_state.input_val_1, placeholder="e.g., Python Project, Translation Service...")
-        st.session_state.input_val_2 = st.text_input("2. Target Audience / Client Name:", value=st.session_state.input_val_2, placeholder="e.g., John Doe, E-commerce Store Owners...")
-        st.session_state.input_val_3 = st.text_input("3. Core Features / Your Skills:", value=st.session_state.input_val_3, placeholder="e.g., Streamlit Dashboard, Fast Delivery...")
-        st.session_state.input_val_4 = st.text_input("4. Proposed Budget / Price ($):", value=st.session_state.input_val_4, placeholder="e.g., $150, $500...")
+    # --- 🎭 TONE OF VOICE SELECTOR (ƏSAS EKRANDA HƏMİŞƏ GÖRÜNÜR) ---
+# Qlamur alətlər paneli (Düymələr yan-yana 3 bərabər sütuna bölünür)
+        col1, col2, col3 = st.columns(3)
         
-        if st.session_state.input_val_1 or st.session_state.input_val_2 or st.session_state.input_val_3 or st.session_state.input_val_4:
-            st.session_state.template_text = f"Generate {st.session_state.active_template} for {st.session_state.input_val_1}. Target: {st.session_state.input_val_2}. Details: {st.session_state.input_val_3}. Budget/Price: {st.session_state.input_val_4}."
-        st.write("---")
-
-    # --- 📝 MAIN TEXT AREA ---
-user_prompt = st.text_area(
-        "Final Prompt Dashboard",
-        value=st.session_state.template_text,
-        placeholder="Select a template from the sidebar or fill the inputs above...",
-        height=100
-    )
-
-if st.button("Generate Text ✨", use_container_width=True):
-        t_name = st.session_state.active_template if st.session_state.active_template else "Marketing Copy"
-        p_title = st.session_state.input_val_1 if st.session_state.input_val_1 else "Digital Project"
-        t_target = st.session_state.input_val_2 if st.session_state.input_val_2 else "Valued Client"
-        f_details = st.session_state.input_val_3 if st.session_state.input_val_3 else "High-quality professional services"
-        p_price = st.session_state.input_val_4 if st.session_state.input_val_4 else "$150"
-        
-        # Hər bir şablon üçün tam zəngin və möhtəşəm nəticə simulyasiyası
-        st.session_state.generated_result = f"""Dear {t_target},
-This is your custom high-converting {t_name} created specifically for your request regarding: "{p_title}".[⚡ PREMIUM CONTENT GENERATED BY AI]Our customized solution is built using advanced methodologies targeting {t_target}. The core deliverables include optimized execution of {f_details}. All benchmarks have been analyzed, and the proposed budget structure for this operational milestone is set at {p_price}.Selected Style and Emotion: {selected_tone}The layout is fully ready to copy and export for your professional workflows.Best regards,Professional Global Consultant"""# --- 📊 COPY, EDIT, EXPORT DÜYMƏLƏRİNİN HAMISI BURADADIR ---if st.session_state.generated_result:st.write("---")st.write("### ✨ AI Generated Result")final_output = st.text_area("✍️ Edit your result here:", value=st.session_state.generated_result, height=200)col1, col2, col3 = st.columns(3)with col1:if st.button("📋 Copy to Clipboard", use_container_width=True):st.success("Copied to clipboard successfully!")with col2:if st.button("🔄 Regenerate", use_container_width=True):st.info("Refreshing AI engine... Text regenerated!")with col3:st.download_button(label="📄 Export (TXT/DOCX)",data=final_output,file_name="ai_generated_copy.txt",mime="text/plain",use_container_width=True)
+        with col1:
+            if st.button("📋 Copy to Clipboard", use_container_width=True):
+                st.success("Copied to clipboard successfully!")
+                
+        with col2:
+            if st.button("🔄 Regenerate", use_container_width=True):
+                st.info("Refreshing AI engine... Text regenerated!")
+                
+        with col3:
+            st.download_button(
+                label="📄 Export (TXT/DOCX)",
+                data=final_output,
+                file_name="copyai_pro_output.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
