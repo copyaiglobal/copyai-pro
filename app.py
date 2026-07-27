@@ -28,7 +28,6 @@ if "used_words" not in st.session_state:
 if "current_plan" not in st.session_state:
     st.session_state.current_plan = "Starter"
 
-# Məlumatların itməməsi üçün onları yaddaş qutularına qoyuruq
 if "job_link_val" not in st.session_state:
     st.session_state.job_link_val = ""
 if "client_name_val" not in st.session_state:
@@ -62,7 +61,7 @@ if not st.session_state.is_logged_in:
                 st.error("This email is already registered! Please log in.")
             else:
                 st.session_state.registered_users[new_email] = {"password": new_password, "plan": "Starter"}
-                st.success("Account created successfully! Payment gateway ready.")
+                st.success("Account created successfully!")
                 st.info("💡 Please switch to 'Log In' tab to access your secure dashboard.")
                 
     with auth_tab2:
@@ -73,6 +72,7 @@ if not st.session_state.is_logged_in:
         if st.button("Verify & Log In 🚀", use_container_width=True):
             if login_email in st.session_state.registered_users and st.session_state.registered_users[login_email]["password"] == login_password:
                 st.session_state.is_logged_in = True
+                st.session_state.current_plan = "Starter"  # Giriş edən an planı mətni "Starter" olaraq kilidləyirik!
                 st.success("Access Granted! Welcome back.")
                 st.rerun()
             else:
@@ -83,19 +83,30 @@ else:
     st.title("🚀 CopyAI Pro — AI Text Generator")
     st.subheader("Global SaaS Platform for Freelancers & Agencies")
 
-    current_plan_name = st.session_state.current_plan
+    # --- 🛡️ PLANI 100% SƏRT MƏTNƏ ÇEVİRƏN MÜHƏRRİK ---
+    current_plan_name = "Starter"
+    raw_plan = st.session_state.get("current_plan", "Starter")
+    
+    # Əgər dəyişən fərqli formatdadırsa, təmizləyirik
+    if "Growth" in str(raw_plan):
+        current_plan_name = "Growth"
+    elif "Enterprise" in str(raw_plan):
+        current_plan_name = "Enterprise"
+    else:
+        current_plan_name = "Starter"
+# Limit dəyərini zirehli şəkildə alırıq (Qətiyyən KeyError verə bilməz!)
+    max_limit = PLAN_LIMITS.get(current_plan_name, 50000)
 
     # --- 📋 ENGLISH SIDEBAR TEMPLATES ---
     st.sidebar.header("📊 User Dashboard")
     st.sidebar.write(f"Current Plan: {current_plan_name} Plan")
-    st.sidebar.progress(min(st.session_state.used_words / PLAN_LIMITS[current_plan_name], 1.0))
-st.sidebar.write(f"📝 Used Words: {st.session_state.used_words} / {PLAN_LIMITS[current_plan_name]}")
+    st.sidebar.progress(min(st.session_state.used_words / max_limit, 1.0))
+    st.sidebar.write(f"📝 Used Words: {st.session_state.used_words} / {max_limit}")
     
-st.sidebar.write("---")
-st.sidebar.header("⚡ Premium Templates")
+    st.sidebar.write("---")
+    st.sidebar.header("⚡ Premium Templates")
     
-    # 1. BÜTÜN FREELANCER ŞABLONLARI GERİ GƏLDİ
-with st.sidebar.expander("💼 For Freelancers"):
+    with st.sidebar.expander("💼 For Freelancers"):
         if st.button("📝 Upwork Proposal Generator", use_container_width=True):
             st.session_state.active_template = "upwork"
             st.session_state.template_text = ""
@@ -117,8 +128,7 @@ with st.sidebar.expander("💼 For Freelancers"):
             st.session_state.template_text = "Write a professional, friendly invoice email requesting payment for the completed digital marketing project."
             st.session_state.generated_result = ""
 
-    # 2. BÜTÜN AGENTLİK ŞABLONLARI GERİ GƏLDİ
-with st.sidebar.expander("🏢 For Agencies"):
+    with st.sidebar.expander("🏢 For Agencies"):
         if st.button("📣 Social Media Ad Copy", use_container_width=True):
             st.session_state.active_template = "agency"
             st.session_state.template_text = "Write 3 high-converting, emotional Facebook and Instagram ad copy variations for an eco-friendly water bottle brand."
@@ -139,9 +149,7 @@ with st.sidebar.expander("🏢 For Agencies"):
             st.session_state.active_template = "agency"
             st.session_state.template_text = "Create a 7-day social media content calendar grid for an Instagram profile focused on personal finance education."
             st.session_state.generated_result = ""
-
-    # 3. BÜTÜN ŞİRKƏT ŞABLONLARI GERİ GƏLDİ
-with st.sidebar.expander("🚀 For Companies"):
+    with st.sidebar.expander("🚀 For Companies"):
         if st.button("💼 Job Descriptions", use_container_width=True):
             st.session_state.active_template = "company"
             st.session_state.template_text = "Write an attractive, professional job description for a Remote Senior Python Developer position on LinkedIn."
@@ -163,19 +171,8 @@ with st.sidebar.expander("🚀 For Companies"):
             st.session_state.template_text = "Analyze this text and generate a official brand voice and tone guidelines guide for copywriters: [Insert text here]"
             st.session_state.generated_result = ""
 
-            st.sidebar.write("---")
-        if st.sidebar.button("Log Out 🚪", use_container_width=True):
-            st.session_state.is_logged_in = False
-            st.session_state.template_text = ""
-            st.session_state.active_template = ""
-            st.session_state.generated_result = ""
-            st.rerun()
-
-    # --- 🎭 TONE OF VOICE SELECTOR ---
-st.write("### 🗣️ Select Tone of Voice")
-selected_tone = st.selectbox(
-        "Choose the style and emotion for the AI generation:",
-        ["Professional 💼", "Casual ☕", "Witty & Funny ✨", "Persuasive 📈"]
-    )
-
-st.write("---")
+    st.sidebar.write("---")
+    if st.sidebar.button("Log Out 🚪", use_container_width=True):
+        st.session_state.is_logged_in = False
+        st.session_state.template_text = ""
+        st.session_state.active_template = ""
