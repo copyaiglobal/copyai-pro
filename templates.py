@@ -1,11 +1,32 @@
 import streamlit as st
+# -----------------------------
+# GENERATED RESULT
+# -----------------------------
+def show_result():
+    if "generated_text" not in st.session_state:
+        st.session_state.generated_text = ""
 
-def show_upwork_fields():
-    st.write("### 📋 Fill the Job Details")
-    job_desc = st.text_area("1. Job Link or Description:", placeholder="Paste the client's Upwork job post here...")
-    user_skills = st.text_input("2. Your Skills & Experience:", placeholder="e.g., Python Developer, Web Designer...")
-    proposed_budget = st.text_input("3. Proposed Budget ($):", placeholder="e.g., $150, $500...")
-    
-    if job_desc or user_skills or proposed_budget:
-        st.session_state.template_text = f"Write a professional Upwork proposal.\nClient Job: {job_desc}\nMy Skills: {user_skills}\nBudget: {proposed_budget}"
-    st.write("---")
+    if st.session_state.generated_text != "":
+
+        st.write("---")
+    st.subheader("📄 Generated Result")
+
+    st.text_area(
+        "AI Output",
+        value=st.session_state.generated_text,
+        height=300
+    )
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        if st.button("📋 Copy", use_container_width=True):
+            st.success("Text copied!")
+
+    with col2:
+        if st.button("✏️ Edit", use_container_width=True):
+            st.info("Edit mode will be available soon.")
+
+    with col3:
+        if st.button("🔄 Regenerate", use_container_width=True):
+            st.info("Generating a new version...")
