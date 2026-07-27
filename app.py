@@ -28,6 +28,16 @@ if "used_words" not in st.session_state:
 if "current_plan" not in st.session_state:
     st.session_state.current_plan = "Starter"
 
+# İlkin dəyişənləri birbaşa session_state daxilinə yığırıq ki, NameError tamamilə yox olsun
+if "job_link_val" not in st.session_state:
+    st.session_state.job_link_val = ""
+if "client_name_val" not in st.session_state:
+    st.session_state.client_name_val = ""
+if "user_skills_val" not in st.session_state:
+    st.session_state.user_skills_val = ""
+if "proposed_budget_val" not in st.session_state:
+    st.session_state.proposed_budget_val = ""
+
 st.set_page_config(page_title="CopyAI Pro - SaaS", page_icon="🚀", layout="centered")
 
 # --- 🔐 REGISTRATION & LOGIN SYSTEM ---
@@ -80,19 +90,17 @@ if not st.session_state.is_logged_in:
                 st.rerun()
             else:
                 st.error("Invalid email or password! Please check your credentials.")
-
 # --- 📊 REAL DASHBOARD & PREMIUM TEMPLATES ---
 else:
     st.title("🚀 CopyAI Pro — AI Text Generator")
     st.subheader("Global SaaS Platform for Freelancers & Agencies")
 
-    # --- 🛡️ PLANI MƏTNƏ ÇEVİRƏN VƏ XƏTANI ÖLDÜRƏN QƏTİ SƏDD ---
     raw_plan = st.session_state.get("current_plan", "Starter")
     if isinstance(raw_plan, list):
         current_plan_name = str(raw_plan[0]) if raw_plan else "Starter"
     else:
         current_plan_name = str(raw_plan)
-# Əgər hər hansı səbəbdən plan adı lüğətdə yoxdursa, məcburi Starter edirik
+
     if current_plan_name not in PLAN_LIMITS:
         current_plan_name = "Starter"
 
@@ -129,20 +137,15 @@ else:
     st.write("---")
 
     # --- ⚙️ SƏNİN ŞƏKİLDƏKİ DOLDURMA SAHƏLƏRİN (DYNAMIC INPUTS) ---
-    job_link = ""
-    client_name = ""
-    user_skills = ""
-    proposed_budget = ""
-
     if st.session_state.active_template == "upwork":
         st.write("### 📋 Fill the Job Details")
-        job_link = st.text_input("1. Job Link or Title:", placeholder="e.g., Python Streamlit Project...")
-        client_name = st.text_input("2. Client's Name (If known):", placeholder="e.g., John Doe...")
-        user_skills = st.text_input("3. Your Skills & Experience:", placeholder="e.g., UI/UX Builder, 2 years Python...")
-        proposed_budget = st.text_input("4. Proposed Budget ($):", placeholder="e.g., $250...")
+        st.session_state.job_link_val = st.text_input("1. Job Link or Title:", placeholder="e.g., Python Streamlit Project...")
+        st.session_state.client_name_val = st.text_input("2. Client's Name (If known):", placeholder="e.g., John Doe...")
+        st.session_state.user_skills_val = st.text_input("3. Your Skills & Experience:", placeholder="e.g., UI/UX Builder, 2 years Python...")
+        st.session_state.proposed_budget_val = st.text_input("4. Proposed Budget ($):", placeholder="e.g., $250...")
         
-        if job_link or client_name or user_skills or proposed_budget:
-            st.session_state.template_text = f"Generate Upwork Proposal for {job_link} targeting client {client_name}. My skills: {user_skills}. Budget: {proposed_budget}."
+        if st.session_state.job_link_val or st.session_state.client_name_val or st.session_state.user_skills_val or st.session_state.proposed_budget_val:
+            st.session_state.template_text = f"Generate Upwork Proposal for {st.session_state.job_link_val} targeting client {st.session_state.client_name_val}. My skills: {st.session_state.user_skills_val}. Budget: {st.session_state.proposed_budget_val}."
         st.write("---")
 
     # --- 📝 MAIN TEXT AREA ---
@@ -154,10 +157,16 @@ else:
     )
 
     if st.button("Generate Text ✨", use_container_width=True):
-        st.session_state.generated_result = f"Dear {client_name if client_name else 'Client'},\n\nI am writing to express my strong interest in your project: {job_link if job_link else 'Web Development'}.\n\nWith my solid expertise as a {user_skills if user_skills else 'Python Streamlit Developer'}, I am confident that I can deliver a high-quality dashboard tailored exactly to your needs. I have analyzed your requirements and my proposed budget for this milestone is {proposed_budget if proposed_budget else '$150'}.\n\nLooking forward to working with you!\n\nBest regards,\nProfessional Freelancer"
+        c_name = st.session_state.client_name_val if st.session_state.client_name_val else 'Client'
+        j_link = st.session_state.job_link_val if st.session_state.job_link_val else 'Web Development'
+        u_skills = st.session_state.user_skills_val if st.session_state.user_skills_val else 'Python Streamlit Developer'
+        p_budget = st.session_state.proposed_budget_val if st.session_state.proposed_budget_val else '$150'
+        
+        st.session_state.generated_result = f"Dear {c_name},\n\nI am writing to express my strong interest in your project: {j_link}.\n\nWith my solid expertise as a {u_skills}, I am confident that I can deliver a high-quality dashboard tailored exactly to your needs.
+        "I have analyzed your requirements and my proposed budget for this milestone is {p_budget}.\n\nLooking forward to working with you!\n\nBest regards,\nProfessional Freelancer"
 
     # --- 📊 SƏNİN ŞƏKİLDƏKİ ZƏNGİN NƏTİCƏ HİSSƏSİ (COPY, EDIT, EXPORT) ---
-    if st.session_state.generated_result:
+if st.session_state.generated_result:
         st.write("---")
         st.write("### ✨ AI Generated Result")
         
@@ -169,11 +178,11 @@ else:
             if st.button("📋 Copy to Clipboard", use_container_width=True):
                 st.success("Copied to clipboard successfully!")
                 
-with col2:
+        with col2:
             if st.button("🔄 Regenerate", use_container_width=True):
                 st.info("Refreshing AI engine... Text regenerated!")
                 
-with col3:
+        with col3:
             st.download_button(
                 label="📄 Export (TXT/DOCX)",
                 data=final_output,
